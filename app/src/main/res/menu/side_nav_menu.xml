@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/side_nav_theme_sec_header"
+        android:title="">
+        <menu>
+            <group
+                android:checkableBehavior="single">
+
+                <item
+                    android:id="@+id/side_nav_theme_neshan"
+                    android:title="@string/side_nav_theme_neshan" />
+
+                <item
+                    android:id="@+id/side_nav_theme_standard_night"
+                    android:title="@string/side_nav_theme_standard_night" />
+
+                <item
+                    android:id="@+id/side_nav_theme_standard_day"
+                    android:title="@string/side_nav_theme_standard_day" />
+
+            </group>
+        </menu>
+    </item>
+
+</menu>

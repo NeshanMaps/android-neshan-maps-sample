@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">نشان (نمونه)</string>
+    <string name="side_nav_theme_standard_night">استاندارد شب</string>
+    <string name="side_nav_theme_neshan">نشان</string>
+    <string name="side_nav_theme_sec_header">پوسته ی نقشه</string>
+    <string name="side_nav_theme_standard_day">استاندارد روز</string>
+</resources>
