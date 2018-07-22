@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/reset_camera_tilt"
+        android:title="@string/main_activity_toolbar_reset_camera_tilt"
+        android:icon="@drawable/ic_tilt"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/reset_camera_bearing"
+        android:title="@string/main_activity_toolbar_reset_camera_bearing"
+        android:icon="@drawable/ic_compass"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/clear_map"
+        android:title="@string/main_activity_toolbar_clear"
+        android:icon="@drawable/ic_clear"
+        app:showAsAction="always"/>
+
+</menu>

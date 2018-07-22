@@ -3,26 +3,59 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/side_nav_theme_sec_header"
-        android:title="">
+        android:id="@+id/side_nav_draw_line"
+        android:icon="@drawable/ic_line"
+        android:title="@string/side_nav_draw_line" />
+
+    <item
+        android:id="@+id/side_nav_draw_polygon"
+        android:icon="@drawable/ic_polygon"
+        android:title="@string/side_nav_draw_polygon" />
+
+    <item
+        android:title="@string/side_nav_theme_sec_header">
         <menu>
             <group
                 android:checkableBehavior="single">
 
                 <item
-                    android:id="@+id/side_nav_theme_neshan"
-                    android:title="@string/side_nav_theme_neshan" />
+                    android:id="@+id/side_nav_theme_standard_day"
+                    android:icon="@drawable/ic_sun"
+                    android:title="@string/side_nav_theme_standard_day" />
 
                 <item
                     android:id="@+id/side_nav_theme_standard_night"
+                    android:icon="@drawable/ic_night"
                     android:title="@string/side_nav_theme_standard_night" />
 
                 <item
-                    android:id="@+id/side_nav_theme_standard_day"
-                    android:title="@string/side_nav_theme_standard_day" />
+                    android:id="@+id/side_nav_theme_neshan"
+                    android:icon="@drawable/ic_navigation"
+                    android:title="@string/side_nav_theme_neshan" />
 
             </group>
         </menu>
     </item>
+
+    <item
+        android:title="@string/side_nav_more">
+        <menu>
+            <group
+                android:checkableBehavior="none">
+
+                <item
+                    android:id="@+id/side_nav_project_src"
+                    android:icon="@drawable/ic_code"
+                    android:title="@string/side_nav_project_src" />
+
+                <item
+                    android:id="@+id/side_nav_about"
+                    android:icon="@drawable/ic_info_outline"
+                    android:title="@string/side_nav_about" />
+
+            </group>
+        </menu>
+    </item>
+
 
 </menu>

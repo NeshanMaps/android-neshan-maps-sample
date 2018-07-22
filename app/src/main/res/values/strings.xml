@@ -1,7 +1,22 @@
 <resources>
-    <string name="app_name">نشان (نمونه)</string>
-    <string name="side_nav_theme_standard_night">استاندارد شب</string>
-    <string name="side_nav_theme_neshan">نشان</string>
-    <string name="side_nav_theme_sec_header">پوسته ی نقشه</string>
-    <string name="side_nav_theme_standard_day">استاندارد روز</string>
+    <string name="app_name">Neshan Java Sample</string>
+    <string name="neshan_platform">
+         Java Sample
+        \n
+        زیرساخت توسعه نقشه «نشان»
+    </string>
+    <string name="side_nav_draw_line">رسم خط</string>
+    <string name="side_nav_draw_polygon">رسم منحنی</string>
+    <string name="side_nav_camera_tilt">شیب نقشه</string>
+    <string name="side_nav_theme_standard_night">پوسته استاندارد شب</string>
+    <string name="side_nav_theme_neshan">پوسته نشان</string>
+    <string name="side_nav_theme_standard_day">پوسته استاندارد روز</string>
+    <string name="side_nav_project_src">متن برنامه</string>
+    <string name="side_nav_about">درباره</string>
+    <string name="user_location">موقعیت فعلی</string>
+    <string name="side_nav_theme_sec_header">پوسته نقشه</string>
+    <string name="side_nav_more">بیشتر</string>
+    <string name="main_activity_toolbar_clear">پاک کردن</string>
+    <string name="main_activity_toolbar_reset_camera_bearing">رو به شمال</string>
+    <string name="main_activity_toolbar_reset_camera_tilt">دید عمودی</string>
 </resources>

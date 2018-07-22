@@ -6,13 +6,14 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.res.ResourcesCompat;
@@ -24,8 +25,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 
+import org.neshan.core.Bounds;
+import org.neshan.core.Range;
 import org.neshan.sample.R;
 import org.neshan.sample.starter.util.RecordKeeper;
 import org.neshan.core.LngLat;
@@ -51,6 +56,7 @@ import org.neshan.ui.ClickData;
 import org.neshan.ui.ClickType;
 import org.neshan.ui.MapEventListener;
 import org.neshan.ui.MapView;
+import org.neshan.utils.BitmapUtils;
 import org.neshan.vectorelements.Label;
 import org.neshan.vectorelements.Line;
 import org.neshan.vectorelements.Marker;
@@ -89,9 +95,7 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
     DrawerLayout drawer;
     NavigationView nav;
     Toolbar toolbar;
-    FloatingActionButton focusOnUserLocationBtn;
-    Button drawLineBtn;
-    Button drawPolylineBtn;
+    Button focusOnUserLocationBtn;
 
     VectorElementLayer userMarkerLayer;
     VectorElementLayer markerLayer;
@@ -103,9 +107,17 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
         initLayoutReferences();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_activity_toolbar, menu);
+        return true;
     }
 
     private void initLayoutReferences() {
@@ -143,20 +155,6 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
                 }
             }
         });
-
-        drawLineBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawLineGeom();
-            }
-        });
-
-        drawPolylineBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawPolygonGeom();
-            }
-        });
     }
 
     private void initSideNavigation() {
@@ -180,8 +178,6 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         nav = findViewById(R.id.side_nav);
         toolbar = findViewById(R.id.toolbar);
         focusOnUserLocationBtn = findViewById(R.id.user_location_btn);
-        drawLineBtn = findViewById(R.id.draw_line);
-        drawPolylineBtn = findViewById(R.id.draw_polyline_btn);
     }
 
     private void initToolbar() {
@@ -191,6 +187,13 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
     }
 
     private void initMap(){
+        /** getLayers().insert()
+         when you insert a layer in index i, index (i - 1) should exist
+         keep base map layer at index 0
+         ********
+         getLayers().add()
+         suppose map has k layers right now, new layer adds in index (k + 1)
+         */
         userMarkerLayer = NeshanServices.createVectorElementLayer();
         markerLayer = NeshanServices.createVectorElementLayer();
         lineLayer = NeshanServices.createVectorElementLayer();
@@ -206,7 +209,14 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
 
         // add Standard_day map to layers
         mapStyle = RecordKeeper.instance(this).getMapTheme();
+        map.getOptions().setZoomRange(new Range(4.5f, 18f));
         map.getLayers().insert(BASE_MAP_INDEX, NeshanServices.createBaseMap(mapStyle));
+
+        //Iran Bound
+        map.getOptions().setPanBounds(new Bounds(
+                new LngLat(43.505859, 24.647017),
+                new LngLat(63.984375, 40.178873))
+        );
     }
 
     public void updateCurrentLocation(){
@@ -256,6 +266,18 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
             case android.R.id.home:
                 drawer.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.clear_map:
+                markerLayer.clear();
+                lineLayer.clear();
+                polygonLayer.clear();
+                labelLayer.clear();
+                return true;
+            case R.id.reset_camera_bearing:
+                map.setBearing(0f, 0.3f);
+                return true;
+            case  R.id.reset_camera_tilt:
+                map.setTilt(90f, 0.4f);
+                return true;
             default:
                 return false;
         }
@@ -266,21 +288,47 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         Intent intent = new Intent(MainActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         switch (id){
-            case R.id.side_nav_theme_neshan:
-                drawer.closeDrawer(GravityCompat.START, false);
-                RecordKeeper.instance(this).setMapTheme(NeshanMapStyle.NESHAN);
+            case R.id.side_nav_draw_line:
+                drawer.closeDrawer(GravityCompat.START);
+                drawLineGeom();
                 break;
-            case R.id.side_nav_theme_standard_night:
-                drawer.closeDrawer(GravityCompat.START, false);
-                RecordKeeper.instance(this).setMapTheme(NeshanMapStyle.STANDARD_NIGHT);
+            case R.id.side_nav_draw_polygon:
+                drawer.closeDrawer(GravityCompat.START);
+                drawPolygonGeom();
                 break;
             case R.id.side_nav_theme_standard_day:
-                drawer.closeDrawer(GravityCompat.START, false);
+                drawer.closeDrawer(GravityCompat.START);
+                map.getLayers().remove(map.getLayers().get(0));
+                map.getLayers().insert(0, NeshanServices.createBaseMap(NeshanMapStyle.STANDARD_DAY));
                 RecordKeeper.instance(this).setMapTheme(NeshanMapStyle.STANDARD_DAY);
+                mapStyle = NeshanMapStyle.STANDARD_DAY;
+                initSideNavigation();
+                break;
+            case R.id.side_nav_theme_standard_night:
+                drawer.closeDrawer(GravityCompat.START);
+                map.getLayers().remove(map.getLayers().get(0));
+                map.getLayers().insert(0, NeshanServices.createBaseMap(NeshanMapStyle.STANDARD_NIGHT));
+                RecordKeeper.instance(this).setMapTheme(NeshanMapStyle.STANDARD_NIGHT);
+                mapStyle = NeshanMapStyle.STANDARD_NIGHT;
+                initSideNavigation();
+                break;
+            case R.id.side_nav_theme_neshan:
+                drawer.closeDrawer(GravityCompat.START);
+                map.getLayers().remove(map.getLayers().get(0));
+                map.getLayers().insert(0, NeshanServices.createBaseMap(NeshanMapStyle.NESHAN));
+                RecordKeeper.instance(this).setMapTheme(NeshanMapStyle.NESHAN);
+                mapStyle = NeshanMapStyle.NESHAN;
+                initSideNavigation();
+                break;
+            case R.id.side_nav_project_src:
+                drawer.closeDrawer(GravityCompat.START, false);
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/NeshanMaps/kotlin-neshan-maps-sample")));
+                break;
+            case R.id.side_nav_about:
+                drawer.closeDrawer(GravityCompat.START, false);
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://developer.neshan.org/")));
                 break;
         }
-        startActivity(intent);
-        overridePendingTransition(R.anim.theme_switch_fade_in, R.anim.theme_switch_fade_out);
         return false;
     }
 
@@ -311,7 +359,8 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         AnimationStyle animSt = animStBl.buildStyle();
 
         MarkerStyleCreator markStCr = new MarkerStyleCreator();
-        markStCr.setSize(18f);
+        markStCr.setSize(20f);
+        markStCr.setBitmap(BitmapUtils.createBitmapFromAndroidBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_marker)));
         markStCr.setAnimationStyle(animSt);
         MarkerStyle markSt = markStCr.buildStyle();
 
@@ -319,11 +368,8 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
 
         LabelStyleCreator labStCr = new LabelStyleCreator();
         labStCr.setBackgroundColor(new ARGB((short) 100, (short) 100, (short) 100, (short) 100));
-        labStCr.setStrokeWidth(20f);
         LabelStyle labSt = labStCr.buildStyle();
-        Label label = new Label(loc, labSt, loc.getY() + "," + loc.getX());
-        Log.d("markerLayer", "lat= " + loc.getY() + " lon= " + loc.getX());
-
+        Label label = new Label(new LngLat(53.529929, 35.164676), labSt, "SSS" + "," + "AAAA");
 
         markerLayer.add(marker);
         labelLayer.add(label);
@@ -340,7 +386,8 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         AnimationStyle animSt = animStBl.buildStyle();
 
         MarkerStyleCreator markStCr = new MarkerStyleCreator();
-        markStCr.setSize(18f);
+        markStCr.setSize(20f);
+        markStCr.setBitmap(BitmapUtils.createBitmapFromAndroidBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_marker)));
         markStCr.setAnimationStyle(animSt);
         MarkerStyle markSt = markStCr.buildStyle();
 
@@ -350,12 +397,12 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
     }
 
     private LineGeom drawLineGeom(){
+        lineLayer.clear();
         LngLatVector lngLatVector = new LngLatVector();
         lngLatVector.add(new LngLat(59.540182, 36.314163));
         lngLatVector.add(new LngLat(59.539290, 36.310654));
         LineGeom lineGeom = new LineGeom(lngLatVector);
         Line line = new Line(lineGeom, getLineStyle());
-        lineLayer.clear();
         lineLayer.add(line);
         return lineGeom;
     }
@@ -369,6 +416,7 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
     }
 
     private PolygonGeom drawPolygonGeom(){
+        polygonLayer.clear();
         LngLatVector lngLatVector = new LngLatVector();
         lngLatVector.add(new LngLat(59.55231, 36.30745));
         lngLatVector.add(new LngLat(59.54819, 36.31044));
@@ -376,7 +424,6 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         lngLatVector.add(new LngLat(59.55504, 36.31016));
         PolygonGeom polygonGeom = new PolygonGeom(lngLatVector);
         Polygon polygon = new Polygon(polygonGeom, getPolygonStyle());
-        polygonLayer.clear();
         polygonLayer.add(polygon);
         return polygonGeom;
     }
