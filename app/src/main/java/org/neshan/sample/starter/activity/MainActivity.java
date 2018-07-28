@@ -1,6 +1,5 @@
 package org.neshan.sample.starter.activity;
 
-// common project libraries
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -64,10 +63,6 @@ import org.neshan.utils.BitmapUtils;
 import org.neshan.vectorelements.Line;
 import org.neshan.vectorelements.Marker;
 import org.neshan.vectorelements.Polygon;
-
-// libraries to get user location
-// libraries to show Neshan map on screen
-// libraries to save user location and all other locations used in apk
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
