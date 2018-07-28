@@ -73,20 +73,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final String TAG = MainActivity.class.getName();
 
-    // Time between location updates (500 milliseconds or 0.5 seconds)
-    final long MIN_TIME = 500;
-    // Distance between location updates (1m)
-    final float MIN_DISTANCE = 1;
-
     // used to track request permissions
     final int REQUEST_CODE = 123;
 
     final int BASE_MAP_INDEX = 0;
-
-    // Network provider
-    String LOCATION_PROVIDER = LocationManager.NETWORK_PROVIDER;
-    LocationManager locationManager;
-    LocationListener locationListener;
 
     // User's current location
     Location userLocation;
