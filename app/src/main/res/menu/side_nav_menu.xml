@@ -12,50 +12,40 @@
         android:icon="@drawable/ic_polygon"
         android:title="@string/side_nav_draw_polygon" />
 
-    <item
-        android:title="@string/side_nav_theme_sec_header">
-        <menu>
-            <group
-                android:checkableBehavior="single">
+    <group
+        android:checkableBehavior="single">
 
-                <item
-                    android:id="@+id/side_nav_theme_standard_day"
-                    android:icon="@drawable/ic_sun"
-                    android:title="@string/side_nav_theme_standard_day" />
+        <item
+            android:id="@+id/side_nav_theme_standard_day"
+            android:icon="@drawable/ic_sun"
+            android:title="@string/side_nav_theme_standard_day" />
 
-                <item
-                    android:id="@+id/side_nav_theme_standard_night"
-                    android:icon="@drawable/ic_night"
-                    android:title="@string/side_nav_theme_standard_night" />
+        <item
+            android:id="@+id/side_nav_theme_standard_night"
+            android:icon="@drawable/ic_night"
+            android:title="@string/side_nav_theme_standard_night" />
 
-                <item
-                    android:id="@+id/side_nav_theme_neshan"
-                    android:icon="@drawable/ic_navigation"
-                    android:title="@string/side_nav_theme_neshan" />
+        <item
+            android:id="@+id/side_nav_theme_neshan"
+            android:icon="@drawable/ic_navigation"
+            android:title="@string/side_nav_theme_neshan" />
 
-            </group>
-        </menu>
-    </item>
+    </group>
 
-    <item
-        android:title="@string/side_nav_more">
-        <menu>
-            <group
-                android:checkableBehavior="none">
+    <group
+        android:checkableBehavior="none">
 
-                <item
-                    android:id="@+id/side_nav_project_src"
-                    android:icon="@drawable/ic_code"
-                    android:title="@string/side_nav_project_src" />
+        <item
+            android:id="@+id/side_nav_project_src"
+            android:icon="@drawable/ic_code"
+            android:title="@string/side_nav_project_src" />
 
-                <item
-                    android:id="@+id/side_nav_about"
-                    android:icon="@drawable/ic_info_outline"
-                    android:title="@string/side_nav_about" />
+        <item
+            android:id="@+id/side_nav_about"
+            android:icon="@drawable/ic_info_outline"
+            android:title="@string/side_nav_about" />
 
-            </group>
-        </menu>
-    </item>
+    </group>
 
 
 </menu>

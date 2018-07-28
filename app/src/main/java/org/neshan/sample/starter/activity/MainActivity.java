@@ -66,7 +66,7 @@ import org.neshan.vectorelements.Polygon;
 // libraries to show Neshan map on screen
 // libraries to save user location and all other locations used in apk
 
-public class MainActivity extends AppCompatActivity implements  NavigationView.OnNavigationItemSelectedListener  {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getName();
 
@@ -101,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
     VectorElementLayer markerLayer;
     VectorElementLayer lineLayer;
     VectorElementLayer polygonLayer;
-    VectorElementLayer labelLayer;
 
 
     @Override
@@ -131,9 +130,12 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
 
         // when focusOnUserLocation is clicked, camera points to user location
         focusOnUserLocationBtn.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                if (userLocation != null) {
+                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE);
+                } else {
                     addUserMarker(new LngLat(userLocation.getLongitude(), userLocation.getLatitude()));
 
                     map.setFocalPointPosition(
@@ -145,10 +147,10 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         });
 
         // when clicked on map, a marker is added in click location
-        map.setMapEventListener(new MapEventListener(){
+        map.setMapEventListener(new MapEventListener() {
             @Override
-            public void onMapClicked(ClickData mapClickInfo){
-                if(mapClickInfo.getClickType() == ClickType.CLICK_TYPE_LONG) {
+            public void onMapClicked(ClickData mapClickInfo) {
+                if (mapClickInfo.getClickType() == ClickType.CLICK_TYPE_LONG) {
                     clickedLocation = mapClickInfo.getClickPos();
                     LngLat lngLat = new LngLat(clickedLocation.getX(), clickedLocation.getY());
                     addMarker(lngLat);
@@ -186,8 +188,8 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         setSupportActionBar(toolbar);
     }
 
-    private void initMap(){
-        /** getLayers().insert()
+    private void initMap() {
+        /* getLayers().insert()
          when you insert a layer in index i, index (i - 1) should exist
          keep base map layer at index 0
          ********
@@ -198,12 +200,10 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         markerLayer = NeshanServices.createVectorElementLayer();
         lineLayer = NeshanServices.createVectorElementLayer();
         polygonLayer = NeshanServices.createVectorElementLayer();
-        labelLayer = NeshanServices.createVectorElementLayer();
         map.getLayers().add(userMarkerLayer);
         map.getLayers().add(markerLayer);
         map.getLayers().add(lineLayer);
         map.getLayers().add(polygonLayer);
-        map.getLayers().add(labelLayer);
 
         updateCurrentLocation();
 
@@ -219,50 +219,45 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         );
     }
 
-    public void updateCurrentLocation(){
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+    public void updateCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE);
+        } else {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationListener = new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    // when location of user changes, a marker will be added to that location
+                    userLocation = location;
 
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                // when location of user changes, a marker will be added to that location
-                userLocation = location;
+                    addUserMarker(new LngLat(userLocation.getLongitude(), userLocation.getLatitude()));
 
-                addUserMarker(new LngLat(userLocation.getLongitude(), userLocation.getLatitude()));
+                    map.setFocalPointPosition(
+                            new LngLat(userLocation.getLongitude(), userLocation.getLatitude()),
+                            0.25f);
+                    map.setZoom(15, 0.25f);
+                }
 
-                map.setFocalPointPosition(
-                        new LngLat(userLocation.getLongitude(), userLocation.getLatitude()),
-                        0.25f);
-                map.setZoom(15,0.25f);
-            }
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                }
 
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
+                @Override
+                public void onProviderEnabled(String provider) {
+                }
 
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE);
-            return;
+                @Override
+                public void onProviderDisabled(String provider) {
+                }
+            };
+            locationManager.requestLocationUpdates(LOCATION_PROVIDER, MIN_TIME, MIN_DISTANCE, locationListener);
         }
-        locationManager.requestLocationUpdates(LOCATION_PROVIDER, MIN_TIME, MIN_DISTANCE, locationListener);
 
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 drawer.openDrawer(GravityCompat.START);
                 return true;
@@ -270,24 +265,24 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
                 markerLayer.clear();
                 lineLayer.clear();
                 polygonLayer.clear();
-                labelLayer.clear();
                 return true;
             case R.id.reset_camera_bearing:
                 map.setBearing(0f, 0.3f);
                 return true;
-            case  R.id.reset_camera_tilt:
+            case R.id.reset_camera_tilt:
                 map.setTilt(90f, 0.4f);
                 return true;
             default:
                 return false;
         }
     }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         Intent intent = new Intent(MainActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        switch (id){
+        switch (id) {
             case R.id.side_nav_draw_line:
                 drawer.closeDrawer(GravityCompat.START);
                 drawLineGeom();
@@ -336,20 +331,18 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if(requestCode == REQUEST_CODE){
-            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 updateCurrentLocation();
-            }
-            else{
+            } else {
                 Log.d(TAG, "Permission Denied :(");
             }
 
         }
     }
 
-    private void addMarker(LngLat loc){
+    private void addMarker(LngLat loc) {
         markerLayer.clear();
-        labelLayer.clear();
 
         AnimationStyleBuilder animStBl = new AnimationStyleBuilder();
         animStBl.setFadeAnimationType(AnimationType.ANIMATION_TYPE_SMOOTHSTEP);
@@ -365,17 +358,10 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         MarkerStyle markSt = markStCr.buildStyle();
 
         Marker marker = new Marker(loc, markSt);
-
-        LabelStyleCreator labStCr = new LabelStyleCreator();
-        labStCr.setBackgroundColor(new ARGB((short) 100, (short) 100, (short) 100, (short) 100));
-        LabelStyle labSt = labStCr.buildStyle();
-        Label label = new Label(new LngLat(53.529929, 35.164676), labSt, "SSS" + "," + "AAAA");
-
         markerLayer.add(marker);
-        labelLayer.add(label);
     }
 
-    private void addUserMarker(LngLat loc){
+    private void addUserMarker(LngLat loc) {
         userMarkerLayer.clear();
 
         AnimationStyleBuilder animStBl = new AnimationStyleBuilder();
@@ -396,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         userMarkerLayer.add(marker);
     }
 
-    private LineGeom drawLineGeom(){
+    private LineGeom drawLineGeom() {
         lineLayer.clear();
         LngLatVector lngLatVector = new LngLatVector();
         lngLatVector.add(new LngLat(59.540182, 36.314163));
@@ -407,15 +393,15 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         return lineGeom;
     }
 
-    private LineStyle getLineStyle(){
+    private LineStyle getLineStyle() {
         LineStyleCreator lineStCr = new LineStyleCreator();
-        lineStCr.setColor(new ARGB((short) 2, (short) 119, (short) 189, (short)190));
+        lineStCr.setColor(new ARGB((short) 2, (short) 119, (short) 189, (short) 190));
         lineStCr.setWidth(12f);
         lineStCr.setStretchFactor(0f);
         return lineStCr.buildStyle();
     }
 
-    private PolygonGeom drawPolygonGeom(){
+    private PolygonGeom drawPolygonGeom() {
         polygonLayer.clear();
         LngLatVector lngLatVector = new LngLatVector();
         lngLatVector.add(new LngLat(59.55231, 36.30745));
@@ -428,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         return polygonGeom;
     }
 
-    private PolygonStyle getPolygonStyle(){
+    private PolygonStyle getPolygonStyle() {
         PolygonStyleCreator polygonStCr = new PolygonStyleCreator();
         polygonStCr.setLineStyle(getLineStyle());
         return polygonStCr.buildStyle();
