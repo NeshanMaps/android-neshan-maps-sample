@@ -23,6 +23,9 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    //play services
+    implementation 'com.google.android.gms:play-services-gcm:15.0.1'
+    implementation 'com.google.android.gms:play-services-location:15.0.1'
     //Neshan sdk library
     implementation 'neshan-android-sdk:mobile-sdk:0.9.3'
     //Test

@@ -3,7 +3,7 @@ package org.neshan.sample.starter.activity;
 // common project libraries
 
 import android.Manifest;
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
@@ -12,10 +12,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -28,24 +28,28 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import org.neshan.core.Bounds;
-import org.neshan.core.Range;
-import org.neshan.sample.R;
-import org.neshan.sample.starter.util.RecordKeeper;
 import org.neshan.core.LngLat;
 import org.neshan.core.LngLatVector;
+import org.neshan.core.Range;
 import org.neshan.geometry.LineGeom;
 import org.neshan.geometry.PolygonGeom;
 import org.neshan.graphics.ARGB;
 import org.neshan.layers.VectorElementLayer;
+import org.neshan.sample.R;
+import org.neshan.sample.starter.util.RecordKeeper;
 import org.neshan.services.NeshanMapStyle;
 import org.neshan.services.NeshanServices;
 import org.neshan.styles.AnimationStyle;
 import org.neshan.styles.AnimationStyleBuilder;
 import org.neshan.styles.AnimationType;
-import org.neshan.styles.LabelStyle;
-import org.neshan.styles.LabelStyleCreator;
 import org.neshan.styles.LineStyle;
 import org.neshan.styles.LineStyleCreator;
 import org.neshan.styles.MarkerStyle;
@@ -57,7 +61,6 @@ import org.neshan.ui.ClickType;
 import org.neshan.ui.MapEventListener;
 import org.neshan.ui.MapView;
 import org.neshan.utils.BitmapUtils;
-import org.neshan.vectorelements.Label;
 import org.neshan.vectorelements.Line;
 import org.neshan.vectorelements.Marker;
 import org.neshan.vectorelements.Polygon;
@@ -102,6 +105,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     VectorElementLayer lineLayer;
     VectorElementLayer polygonLayer;
 
+    FusedLocationProviderClient fusedLocationClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,10 +124,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getLocationPermission();
+    }
+
     private void initLayoutReferences() {
         initViews();
         initToolbar();
         initMap();
+        initLocation();
         initSideNavigation();
 
         //on side navigation menu clicked
@@ -133,16 +145,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void onClick(View v) {
-                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE);
-                } else {
-                    addUserMarker(new LngLat(userLocation.getLongitude(), userLocation.getLatitude()));
-
-                    map.setFocalPointPosition(
-                            new LngLat(userLocation.getLongitude(), userLocation.getLatitude()),
-                            0.25f);
-                    map.setZoom(15, 0.25f);
-                }
+                getLastLocation();
             }
         });
 
@@ -157,6 +160,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
+    }
+
+    private void initLocation() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
     private void initSideNavigation() {
@@ -205,12 +212,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         map.getLayers().add(lineLayer);
         map.getLayers().add(polygonLayer);
 
-        updateCurrentLocation();
-
         // add Standard_day map to layers
         mapStyle = RecordKeeper.instance(this).getMapTheme();
         map.getOptions().setZoomRange(new Range(4.5f, 18f));
         map.getLayers().insert(BASE_MAP_INDEX, NeshanServices.createBaseMap(mapStyle));
+
+        //set map focus position
+        map.setFocalPointPosition(new LngLat(53.529929, 35.164676), 0f);
+        map.setZoom(4.5f, 0f);
 
         //Iran Bound
         map.getOptions().setPanBounds(new Bounds(
@@ -219,40 +228,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         );
     }
 
-    public void updateCurrentLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE);
-        } else {
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationListener = new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    // when location of user changes, a marker will be added to that location
-                    userLocation = location;
-
-                    addUserMarker(new LngLat(userLocation.getLongitude(), userLocation.getLatitude()));
-
-                    map.setFocalPointPosition(
-                            new LngLat(userLocation.getLongitude(), userLocation.getLatitude()),
-                            0.25f);
-                    map.setZoom(15, 0.25f);
-                }
-
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-                }
-
-                @Override
-                public void onProviderEnabled(String provider) {
-                }
-
-                @Override
-                public void onProviderDisabled(String provider) {
-                }
-            };
-            locationManager.requestLocationUpdates(LOCATION_PROVIDER, MIN_TIME, MIN_DISTANCE, locationListener);
+    private boolean getLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                }, REQUEST_CODE);
+                return false;
+            }
         }
+        return true;
+    }
 
+    @SuppressLint("MissingPermission")
+    private void getLastLocation() {
+        fusedLocationClient
+                .getLastLocation()
+                .addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            onLocationChange(task.getResult());
+                            Log.i(TAG, "lat "+task.getResult().getLatitude()+" lng "+task.getResult().getLongitude());
+                        } else {
+                            Toast.makeText(MainActivity.this, "موقعیت یافت نشد.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void onLocationChange(Location location) {
+        this.userLocation = location;
+        addUserMarker(new LngLat(userLocation.getLongitude(), userLocation.getLatitude()));
+        map.setFocalPointPosition(
+                new LngLat(userLocation.getLongitude(), userLocation.getLatitude()),
+                0.25f);
+        map.setZoom(15, 0.25f);
     }
 
     @Override
@@ -333,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (requestCode == REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                updateCurrentLocation();
+//                updateCurrentLocation();
             } else {
                 Log.d(TAG, "Permission Denied :(");
             }
