@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -44,6 +45,7 @@ import org.neshan.geometry.LineGeom;
 import org.neshan.geometry.PolygonGeom;
 import org.neshan.graphics.ARGB;
 import org.neshan.layers.VectorElementLayer;
+import org.neshan.sample.BuildConfig;
 import org.neshan.sample.R;
 import org.neshan.sample.java.util.RecordKeeper;
 import org.neshan.services.NeshanMapStyle;
@@ -122,6 +124,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initToolbar();
         initMap();
         initLocation();
+
+        TextView appVersion = nav.getHeaderView(0).findViewById(R.id.app_version);
+        appVersion.setText(String.format("نسخه %s", BuildConfig.VERSION_NAME));
+
         initSideNavigation();
 
         //on side navigation menu clicked
