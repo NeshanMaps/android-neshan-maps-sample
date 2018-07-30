@@ -323,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.side_nav_project_src:
                 drawer.closeDrawer(GravityCompat.START, false);
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/NeshanMaps/kotlin-neshan-maps-sample")));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/NeshanMaps/android-neshan-maps-sample")));
                 break;
             case R.id.side_nav_about:
                 drawer.closeDrawer(GravityCompat.START, false);
@@ -331,20 +331,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
         return false;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                updateCurrentLocation();
-            } else {
-                Log.d(TAG, "Permission Denied :(");
-            }
-
-        }
     }
 
     private void addMarker(LngLat loc) {
