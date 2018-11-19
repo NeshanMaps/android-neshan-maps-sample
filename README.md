@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         //set map focus position
         LngLat focalPoint = new LngLat(53.529929, 35.164676);
         map.setFocalPointPosition(focalPoint, 0f);
+        map.setZoom(14f);
         //add basemap layer
         map.getLayers().add(NeshanServices.createBaseMap(NeshanMapStyle.STANDARD_DAY));
     }
@@ -91,6 +92,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         //set map focus position
         map.setFocalPointPosition(LngLat(53.529929, 35.164676), 0f)
+        map.setZoom(14f)
         //add basemap layer
         map.layers.add(NeshanServices.createBaseMap(NeshanMapStyle.STANDARD_DAY))
     }
