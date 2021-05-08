@@ -19,7 +19,7 @@ Add maven repository to your project level `build.gradle`
 ```gradle
 repositories {
     //add maven repo here
-    maven { url "https://dl.bintray.com/neshan/neshan-android-sdk" }
+    maven { url "https://maven.neshan.org/artifactory/public-maven" }
 }
 ```
 
