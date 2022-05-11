@@ -28,7 +28,7 @@ Add to `build.gradle` module app
 ```gradle
 dependencies {
     //Neshan sdk library
-    implementation 'neshan-android-sdk:mobile-sdk:0.9.1'
+    implementation 'neshan-android-sdk:mobile-sdk:0.9.3'
 }
 ```
 
