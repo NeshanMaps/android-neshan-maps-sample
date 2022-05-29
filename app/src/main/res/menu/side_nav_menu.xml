@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/side_nav_draw_line"
@@ -12,8 +11,7 @@
         android:icon="@drawable/ic_polygon"
         android:title="@string/side_nav_draw_polygon" />
 
-    <group
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
 
         <item
             android:id="@+id/side_nav_theme_standard_day"
@@ -32,8 +30,7 @@
 
     </group>
 
-    <group
-        android:checkableBehavior="none">
+    <group android:checkableBehavior="none">
 
         <item
             android:id="@+id/side_nav_project_src"

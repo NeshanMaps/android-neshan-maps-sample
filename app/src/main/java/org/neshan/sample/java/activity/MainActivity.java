@@ -11,13 +11,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,13 +21,20 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.carto.BuildConfig;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.neshan.core.Bounds;
 import org.neshan.core.LngLat;
 import org.neshan.core.LngLatVector;
@@ -45,7 +45,6 @@ import org.neshan.geometry.LineGeom;
 import org.neshan.geometry.PolygonGeom;
 import org.neshan.graphics.ARGB;
 import org.neshan.layers.VectorElementLayer;
-import org.neshan.sample.BuildConfig;
 import org.neshan.sample.R;
 import org.neshan.sample.java.util.RecordKeeper;
 import org.neshan.services.NeshanMapStyle;
@@ -73,28 +72,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String TAG = MainActivity.class.getName();
 
     // used to track request permissions
-    final int REQUEST_CODE = 123;
+    private final int REQUEST_CODE = 123;
 
-    final int BASE_MAP_INDEX = 0;
+    private final int BASE_MAP_INDEX = 0;
 
     // User's current location
-    Location userLocation;
-    FusedLocationProviderClient fusedLocationClient;
+    private Location userLocation;
+    private FusedLocationProviderClient fusedLocationClient;
 
-    LngLat clickedLocation;
+    private LngLat clickedLocation;
 
     // Neshan Map
-    MapView map;
-    NeshanMapStyle mapStyle;
-    DrawerLayout drawer;
-    NavigationView nav;
-    Toolbar toolbar;
-    Button focusOnUserLocationBtn;
+    private MapView map;
+    private NeshanMapStyle mapStyle;
+    private DrawerLayout drawer;
+    private NavigationView nav;
+    private Toolbar toolbar;
+    private Button focusOnUserLocationBtn;
 
-    VectorElementLayer userMarkerLayer;
-    VectorElementLayer markerLayer;
-    VectorElementLayer lineLayer;
-    VectorElementLayer polygonLayer;
+    private VectorElementLayer userMarkerLayer;
+    private VectorElementLayer markerLayer;
+    private VectorElementLayer lineLayer;
+    private VectorElementLayer polygonLayer;
 
 
     @Override
@@ -244,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             onLocationChange(task.getResult());
-                            Log.i(TAG, "lat "+task.getResult().getLatitude()+" lng "+task.getResult().getLongitude());
+                            Log.i(TAG, "lat " + task.getResult().getLatitude() + " lng " + task.getResult().getLongitude());
                         } else {
                             Toast.makeText(MainActivity.this, "موقعیت یافت نشد.", Toast.LENGTH_SHORT).show();
                         }
@@ -388,10 +387,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // min = south-west -> lat = 36.314163, lng = 59.539290
         // max = north-east -> lat = 36.310654, lng = 59.540182
         map.moveToCameraBounds(
-                new Bounds(new LngLat(59.539290,  36.314163), new LngLat(59.540182, 36.310654)),
+                new Bounds(new LngLat(59.539290, 36.314163), new LngLat(59.540182, 36.310654)),
                 new ViewportBounds(
-                        new ViewportPosition(0,0),
-                        new ViewportPosition(map.getWidth(),map.getHeight())
+                        new ViewportPosition(0, 0),
+                        new ViewportPosition(map.getWidth(), map.getHeight())
                 ),
                 true, 0.25f);
         return lineGeom;
@@ -421,10 +420,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // min = south-west -> lat = 36.31296, lng = 59.54819
         // max = north-east -> lat = 36.30745, lng = 59.55504
         map.moveToCameraBounds(
-                new Bounds(new LngLat(59.54819,  36.31296), new LngLat(59.55504, 36.30745)),
+                new Bounds(new LngLat(59.54819, 36.31296), new LngLat(59.55504, 36.30745)),
                 new ViewportBounds(
-                        new ViewportPosition(0,0),
-                        new ViewportPosition(map.getWidth(),map.getHeight())
+                        new ViewportPosition(0, 0),
+                        new ViewportPosition(map.getWidth(), map.getHeight())
                 ),
                 true, 0.25f);
         return polygonGeom;
